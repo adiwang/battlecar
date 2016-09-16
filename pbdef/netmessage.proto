@@ -1,0 +1,39 @@
+message CProto
+{
+	required int32 id = 1;
+	required bytes body = 2;
+}
+
+message CP1
+{
+	required int32 a = 1;
+	required int64 b = 2;
+	required string c = 3;
+}
+
+message CP2
+{
+	required string a = 1;
+	required string b = 2;
+	required int64 c = 3;
+}
+
+message EchoProto
+{
+	required string data = 1;
+}
+
+// 客户端向bs注册序号协议
+message CRegisterClientReqProto
+{
+	required uint32 seq = 1;		// 序号
+}
+
+// 客户端向bs注册通道序号的响应协议
+message SRegisterClientRepProto
+{
+	required uint32 result = 1;		    // 0: 代表成功, 否则: 失败
+}
+
+
+

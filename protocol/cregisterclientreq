@@ -1,0 +1,46 @@
+public:
+	uint32_t _seq;
+	std::string _marshal_data;
+
+public:
+	enum
+	{
+		PROTOCOL_ID = PROTOCOL_ID_CREGISTERCLIENTREQ,
+	};
+	
+	CRegisterClientReq() : _seq(0) {}
+	CRegisterClientReq(uint32_t seq) : _seq(seq) {}
+	~CRegisterClientReq() {}
+
+	virtual const std::string& Marshal()
+	{
+		// 1. 设置协议具体子段
+		CRegisterClientReqProto proto;
+		proto.set_seq(_seq);
+		// 2. 给协议wrap一层，添加protocol id
+		CProto cproto;
+		cproto.set_id(PROTOCOL_ID);
+		cproto.set_body(proto.SerializeAsString());
+		std::string data;
+		cproto.SerializeToString(&data);
+		// 3. 封包
+		NetPacket packet;
+		packet.header = 0xF0;
+		packet.tail = 0x0F;
+		packet.type = 1;
+		packet.datalen = data.size();
+		_marshal_data = PacketData(packet, data.c_str());
+		return _marshal_data;
+	}
+
+	virtual void UnMarshal(const char* buf, int length)
+	{
+		CRegisterClientReqProto proto;
+		proto.ParseFromString(std::string(buf, length));
+		_seq = proto.seq();
+	}
+
+    virtual Protocol* Clone()
+    {
+        return new CRegisterClientReq();
+    }
